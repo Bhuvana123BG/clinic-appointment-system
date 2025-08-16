@@ -23,7 +23,7 @@ staticfiles/  # If you're collecting static files locally
 # Environment
 .env
 .env.*
-
+virtual/
 # VS Code and other IDEs
 .vscode/
 .idea/
