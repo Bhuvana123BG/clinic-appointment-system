@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>My Profile</h3>
+<p><b>Name:</b> {{ request.user.first_name }}</p>
+<p><b>Email:</b> {{ request.user.email }}</p>
+<p><b>Specialization:</b> {{ profile.specialization }}</p>
+<p><b>Availability:</b> {{ profile.availability|default:"—" }}</p>
+<a class="btn btn-outline-primary" href="{% url 'doctor_profile_edit' %}">Edit</a>
+{% endblock %}

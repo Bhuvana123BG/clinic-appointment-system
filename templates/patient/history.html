@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "includes/nav_pat.html" %}
+<div class="container my-4">
+
+    <!-- Title -->
+    <h3 class="fw-bold text-center text-dark mb-4">📋 Appointment History</h3>
+  
+    <!-- Tabs -->
+    <ul class="nav nav-pills justify-content-center mb-4" id="historyTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="approved-tab" data-bs-toggle="pill" data-bs-target="#approved" type="button" role="tab">
+          ✅ Approved <span class="badge bg-success">{{ approved|length }}</span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pending-tab" data-bs-toggle="pill" data-bs-target="#pending" type="button" role="tab">
+          ⏳ Pending <span class="badge bg-warning text-dark">{{ pending|length }}</span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rejected-tab" data-bs-toggle="pill" data-bs-target="#rejected" type="button" role="tab">
+          ❌ Rejected <span class="badge bg-danger">{{ rejected|length }}</span>
+        </button>
+      </li>
+    </ul>
+  
+    <!-- Tab Content -->
+    <div class="tab-content" id="historyTabsContent">
+  
+      <!-- Approved -->
+      <div class="tab-pane fade show active" id="approved" role="tabpanel">
+        {% if approved %}
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+              <h5 class="mb-3 text-success text-center">✅ Approved Appointments</h5>
+              <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                  <thead class="table-light">
+                    <tr><th>Doctor</th><th>Date</th><th>Message</th></tr>
+                  </thead>
+                  <tbody>
+                    {% for a in approved %}
+                      <tr>
+                        <td>Dr. {{ a.doctor.user.first_name|default:a.doctor.user.email }}</td>
+                        <td>{{ a.date }}</td>
+                        <td>{{ a.doctor_message|default:"—" }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-success text-center">No approved records.</div>
+        {% endif %}
+      </div>
+  
+      <!-- Pending -->
+      <div class="tab-pane fade" id="pending" role="tabpanel">
+        {% if pending %}
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+              <h5 class="mb-3 text-warning text-center">⏳ Pending Appointments</h5>
+              <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                  <thead class="table-light">
+                    <tr><th>Doctor</th><th>Date</th><th>Reason</th></tr>
+                  </thead>
+                  <tbody>
+                    {% for a in pending %}
+                      <tr>
+                        <td>Dr. {{ a.doctor.user.first_name|default:a.doctor.user.email }}</td>
+                        <td>{{ a.date }}</td>
+                        <td>{{ a.reason|default:"—" }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-warning text-center">No pending records.</div>
+        {% endif %}
+      </div>
+  
+      <!-- Rejected -->
+      <div class="tab-pane fade" id="rejected" role="tabpanel">
+        {% if rejected %}
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+              <h5 class="mb-3 text-danger text-center">❌ Rejected Appointments</h5>
+              <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                  <thead class="table-light">
+                    <tr><th>Doctor</th><th>Date</th><th>Reason</th></tr>
+                  </thead>
+                  <tbody>
+                    {% for a in rejected %}
+                      <tr>
+                        <td>Dr. {{ a.doctor.user.first_name|default:a.doctor.user.email }}</td>
+                        <td>{{ a.date }}</td>
+                        <td>{{ a.rejection_message|default:"—" }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-danger text-center">No rejected records.</div>
+        {% endif %}
+      </div>
+  
+    </div>
+  </div>
+  
+{% endblock %}

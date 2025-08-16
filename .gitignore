@@ -1,0 +1,55 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/  # If you're collecting static files locally
+*.mo
+
+# Migrations (optional – you may want to track them)
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Environment
+.env
+.env.*
+
+# VS Code and other IDEs
+.vscode/
+.idea/
+*.swp
+
+# Node modules (for frontend)
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build directories
+/dist/
+/build/
+/static/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+
+# Pip
+pip-log.txt
+pip-delete-this-directory.txt

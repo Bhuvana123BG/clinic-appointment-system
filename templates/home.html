@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% include "includes/navbar.html"%}
+<!-- Hero Section -->
+<div class="container-fluid py-5 text-center text-light" style="background: linear-gradient(135deg, #007bff, #00c6ff);">
+    <h1 class="display-4 fw-bold">Welcome to MediBook</h1>
+    <p class="lead">Your Health, Our Priority – Book Appointments Easily</p>
+    <a href="{% url 'patient_login' %}" class="btn btn-light btn-lg m-2">Patient Login</a>
+    <a href="{% url 'doctor_login' %}" class="btn btn-dark btn-lg m-2">Doctor Login</a>
+</div>
+
+
+<!-- Role Cards Section -->
+<div class="container my-5">
+    <div class="row text-center">
+        <!-- Patient Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-body">
+                    <h3 class="card-title">For Patients</h3>
+                    <p class="card-text">Register, login, and book appointments with doctors quickly and securely.</p>
+                    <a href="{% url 'patient_login' %}" class="btn btn-outline-primary">Login as Patient</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-body">
+                    <h3 class="card-title">For Doctors</h3>
+                    <p class="card-text">Login to manage availability, review appointments, and connect with patients.</p>
+                    <a href="{% url 'doctor_login' %}" class="btn btn-outline-success">Login as Doctor</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <h2 class="text-center mb-4">Why Choose MediBook?</h2>
+    <div class="row text-center">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">📅 Easy Booking</h5>
+                    <p class="card-text">Schedule appointments in just a few clicks.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">👩‍⚕️ Trusted Doctors</h5>
+                    <p class="card-text">Connect with qualified healthcare professionals.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">🔔 Updates</h5>
+                    <p class="card-text">Get real-time status updates for your appointments.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">🔒 Secure</h5>
+                    <p class="card-text">Your data is safe with us, always protected.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

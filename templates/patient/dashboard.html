@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+  {% include "includes/nav_pat.html"%}
+   <!-- Dashboard Body -->
+   <div class="container mt-5">
+
+    <!-- Welcome Section -->
+    <div class="card shadow-lg border-0 mb-4 text-center p-4">
+      <h3 class="mb-2">👋 Welcome, {{ request.user.username|title }}</h3>
+      <p class="text-muted">Manage your appointments easily from your dashboard</p>
+  
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center gap-3 mt-3">
+        <a class="btn btn-primary px-4" href="{% url 'make_appointment' %}">
+          <i class="bi bi-plus-circle me-1"></i> Make Appointment
+        </a>
+        <a class="btn btn-secondary px-4" href="{% url 'patient_history' %}">
+          <i class="bi bi-clock-history me-1"></i> Appointment History
+        </a>
+      </div>
+    </div>
+  
+    <!-- Status Cards -->
+    <div class="row text-center">
+        <!-- Pending -->
+        <div class="col-md-4 mb-3">
+          <div class="card shadow-sm p-4 bg-warning bg-opacity-25 h-100">
+            <i class="bi bi-hourglass-split fs-2 text-warning mb-2"></i>
+            <h5 class="fw-bold text-warning">Pending</h5>
+            <p class="fs-4 mb-3">{{ by_status.PENDING|default:0 }}</p>
+            <div class="d-flex justify-content-center">
+            <a href="{% url 'patient_history_status' 'pending' %}" class="btn btn-warning btn-sm w-50">Check Pending</a>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Approved -->
+        <div class="col-md-4 mb-3">
+          <div class="card shadow-sm p-4 bg-success bg-opacity-25 h-100">
+            <i class="bi bi-check-circle fs-2 text-success mb-2"></i>
+            <h5 class="fw-bold text-success">Approved</h5>
+            <p class="fs-4 mb-3">{{ by_status.APPROVED|default:0 }}</p>
+            <div class="d-flex justify-content-center">
+            <a href="{% url 'patient_history_status' 'approved' %}" class="btn btn-success btn-sm w-50">View Approved</a>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Rejected -->
+        <div class="col-md-4 mb-3">
+          <div class="card shadow-sm p-4 bg-danger bg-opacity-25 h-100">
+            <i class="bi bi-x-circle fs-2 text-danger mb-2"></i>
+            <h5 class="fw-bold text-danger">Rejected</h5>
+            <p class="fs-4 mb-3">{{ by_status.REJECTED|default:0 }}</p>
+            <div class="d-flex justify-content-center">
+                <a href="{% url 'patient_history_status' 'rejected' %}" class="btn btn-danger btn-sm w-50">Check Pending</a>
+            </div>
+        </div>
+      </div>
+      
+      <!-- Upcoming Appointment -->
+      {% if upcoming %}
+      <div class="card shadow-lg border-0 mt-4">
+        <div class="card-body text-center p-4">
+          <h4 class="fw-bold text-primary mb-3">📅 Upcoming Appointment</h4>
+      
+          <div class="d-flex justify-content-center align-items-center mb-3">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:60px; height:60px; font-size:24px;">
+              Dr
+            </div>
+            <div class="ms-3 text-start">
+              <h5 class="fw-bold mb-1">Dr. {{ upcoming.doctor.user.username }}</h5>
+              <small class="text-muted">{{ upcoming.doctor.specialization }}</small>
+            </div>
+          </div>
+      
+          <div class="row text-center">
+            <div class="col-md-6 mb-2">
+              <div class="p-3 border rounded bg-light">
+                <p class="fw-bold mb-1">Date</p>
+                <p class="mb-0 text-muted">{{ upcoming.date|date:"M d, Y" }}</p>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <div class="p-3 border rounded bg-light">
+                <p class="fw-bold mb-1">Time</p>
+                <p class="mb-0 text-muted">{{ upcoming.date|time:"h:i A" }}</p>
+              </div>
+            </div>
+          </div>
+      
+          <span class="badge bg-success mt-3 px-3 py-2" style="font-size:14px;">✅ Confirmed</span>
+        </div>
+      </div>
+      {% else %}
+      <div class="card shadow-lg border-0 mt-4 text-center p-4">
+        <h5 class="text-muted mb-0">No upcoming appointments</h5>
+      </div>
+      {% endif %}
+      
+  
+  {% endblock %}
+
+ 

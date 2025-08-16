@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "includes/nav_pat.html" %}
+<div class="container mt-5">
+    <h3 class="mb-4 text-center fw-bold text-primary">
+      {{ status|title }} Appointments
+    </h3>
+  
+    {% if appointments %}
+      <div class="list-group">
+        {% for appointment in appointments %}
+          <div class="list-group-item list-group-item-action border rounded-3 mb-2 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="mb-1">🩺 Dr. {{ appointment.doctor.user.first_name|default:appointment.doctor.user.username|title }}</h5>
+                <p class="mb-1 text-muted"><strong>Reason:</strong> {{ appointment.reason }}</p>
+                <p class="mb-1 text-muted"><strong>Date:</strong> {{ appointment.date }}</p>
+              </div>
+              <div>
+                {% if appointment.status == "APPROVED" %}
+                  <span class="badge bg-success p-2">Approved</span>
+                {% elif appointment.status == "PENDING" %}
+                  <span class="badge bg-warning text-dark p-2">Pending</span>
+                {% elif appointment.status == "REJECTED" %}
+                  <span class="badge bg-danger p-2">Rejected</span>
+                {% else %}
+                  <span class="badge bg-secondary p-2">{{ appointment.status }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-info text-center py-4">
+        <i class="bi bi-calendar-x fs-3 d-block mb-2"></i>
+        No {{ status|title }} appointments found.
+      </div>
+    {% endif %}
+  </div>
+  
+  
+{% endblock %}

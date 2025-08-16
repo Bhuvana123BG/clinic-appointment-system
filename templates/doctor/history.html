@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Appointment History</h3>
+
+<h5 class="mt-3">Approved</h5>
+<table class="table table-striped">
+  <tr><th>Patient</th><th>Date</th><th>Message</th></tr>
+  {% for a in approved %}
+    <tr><td>{{ a.patient.user.email }}</td><td>{{ a.date }}</td><td>{{ a.doctor_message|default:"—" }}</td></tr>
+  {% empty %}<tr><td colspan="3">No approved records.</td></tr>{% endfor %}
+</table>
+
+<h5 class="mt-4">Rejected</h5>
+<table class="table table-striped">
+  <tr><th>Patient</th><th>Date</th><th>Reason</th></tr>
+  {% for a in rejected %}
+    <tr><td>{{ a.patient.user.email }}</td><td>{{ a.date }}</td><td>{{ a.rejection_message|default:"—" }}</td></tr>
+  {% empty %}<tr><td colspan="3">No rejected records.</td></tr>{% endfor %}
+</table>
+{% endblock %}

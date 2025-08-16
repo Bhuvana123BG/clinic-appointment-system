@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Welcome Dr. {{ request.user.first_name|default:request.user.email }}</h3>
+
+<!-- Top navigation buttons -->
+<div class="mt-3 mb-3">
+  <a class="btn btn-primary me-2" href="{% url 'doctor_requests' %}">Requests ({{ pending }})</a>
+  <a class="btn btn-secondary me-2" href="{% url 'doctor_history' %}">History</a>
+  <a class="btn btn-outline-info" href="{% url 'doctor_profile' %}">Profile</a>
+</div>
+
+<!-- Stats Row -->
+<div class="row text-center mb-4">
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm bg-light">
+      <h5 class="fw-bold text-warning">Pending</h5>
+      <p class="fs-4">{{ pending }}</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm bg-light">
+      <h5 class="fw-bold text-success">Approved</h5>
+      <p class="fs-4">{{ approved }}</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm bg-light">
+      <h5 class="fw-bold text-danger">Rejected</h5>
+      <p class="fs-4">{{ rejected }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Appointment Requests List -->
+<h4 class="mb-3">Appointment Requests</h4>
+{% for appointment in appointments %}
+  <div class="card shadow-sm p-3 mb-3">
+    <h5>Patient: {{ appointment.patient.user.email }}</h5>
+    <p>Reason: {{ appointment.reason }}</p>
+    <p>Date: {{ appointment.date }}</p>
+
+    {% if appointment.has_conflict %}
+      <p class="text-danger fw-bold">
+        ⚠ This patient already has an approved appointment at this time.
+      </p>
+    {% endif %}
+
+    <!-- Show buttons only if no conflict and still pending -->
+    {% if not appointment.has_conflict and appointment.status == "PENDING" %}
+      <div class="d-flex gap-2">
+        <form method="post" action="{% url 'approve_appointment' appointment.id %}">
+          {% csrf_token %}
+          <button class="btn btn-success btn-sm">Approve</button>
+        </form>
+        <form method="post" action="{% url 'reject_appointment' appointment.id %}">
+          {% csrf_token %}
+          <button class="btn btn-danger btn-sm">Reject</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+{% empty %}
+  <p class="text-muted">No appointment requests at the moment.</p>
+{% endfor %}
+
+{% endblock %}
