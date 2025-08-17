@@ -10,12 +10,12 @@
       <div class="card-body text-center">
         <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3"
              style="width:80px; height:80px; font-size:24px;">
-          {{ doctor.user.username|default:doc.user.email|slice:":1"|upper }}
+          {{ doctor.user.username|default:doctor.user.email|slice:":1"|upper }}
         </div>
-        <h4 class="fw-bold">Dr. {{ doc.user.username|title }}</h4>
-        <p class="text-muted mb-1">Specialization: {{ doc.specialization }}</p>
+        <h4 class="fw-bold">Dr. {{ doctor.user.username|title }}</h4>
+        <p class="text-muted mb-1">Specialization: {{ doctor.specialization }}</p>
         {% if doctor.availability %}
-          <p><span class="badge bg-success">Available</span> {{ doc.availability }}</p>
+          <p><span class="badge bg-success">Available</span> {{ doctor.availability }}</p>
         {% else %}
           <p><span class="badge bg-secondary">Schedule Not Set</span></p>
         {% endif %}
@@ -61,7 +61,8 @@
   </div>
   
   <!-- Include the Modal Here -->
-  {% include "includes/request_modal.html" %}
+  {% comment %} {% include "includes/request_modal.html" %} {% endcomment %}
   
-
+<!-- Appointment Request Modal -->
+{% include "includes/request_modal.html" %}
 {% endblock %}

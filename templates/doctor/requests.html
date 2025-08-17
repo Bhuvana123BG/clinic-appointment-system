@@ -1,58 +1,104 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Pending Requests</h3>
-<table class="table table-hover">
-  <tr><th>Patient</th><th>Date</th><th>Reason</th><th>Actions</th></tr>
-  {% for a in pending %}
-    <tr>
-      <td>{{ a.patient.user.email }}</td>
-      <td>{{ a.date }}</td>
-      <td>{{ a.reason }}</td>
-      <td>
-        <!-- Approve button (modal) -->
-        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#approve{{ a.id }}">Approve</button>
-        <div class="modal fade" id="approve{{ a.id }}" tabindex="-1">
-          <div class="modal-dialog">
-            <form method="post" action="{% url 'approve_request' a.id %}" class="modal-content">
-              {% csrf_token %}
-              <div class="modal-header"><h5 class="modal-title">Approve Appointment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                <label class="form-label">Confirmation message (optional)</label>
-                <textarea name="doctor_message" class="form-control" placeholder="See you at the scheduled time."></textarea>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-success">Approve</button>
-              </div>
-            </form>
-          </div>
+{% include "includes/nav_doc.html" %}
+
+
+<div class="container py-5 bg-light">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <!-- Pending Requests Card -->
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white d-flex align-items-center rounded-top-4">
+          <i class="bi bi-clock-history fs-4 me-2"></i>
+          <h4 class="mb-0">Pending Requests</h4>
         </div>
 
-        <!-- Reject button (modal) -->
-        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reject{{ a.id }}">Reject</button>
-        <div class="modal fade" id="reject{{ a.id }}" tabindex="-1">
-          <div class="modal-dialog">
-            <form method="post" action="{% url 'reject_request' a.id %}" class="modal-content">
-              {% csrf_token %}
-              <div class="modal-header"><h5 class="modal-title">Reject Appointment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                <label class="form-label">Reason (required)</label>
-                <textarea name="rejection_message" class="form-control" required placeholder="Not available at that time."></textarea>
-              </div>
-              <div class="modal-footer">
-                <button class="btn btn-danger">Reject</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <div class="card-body p-4 bg-white rounded-bottom-4">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th><i class="bi bi-person me-1 text-primary"></i>Patient</th>
+                <th><i class="bi bi-calendar-date me-1 text-primary"></i>Date</th>
+                <th><i class="bi bi-chat-left-text me-1 text-primary"></i>Reason</th>
+                <th class="text-center"><i class="bi bi-gear me-1 text-primary"></i>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in pending %}
+                <tr>
+                  <td>{{ a.patient.user.email }}</td>
+                  <td>{{ a.date }}</td>
+                  <td>{{ a.reason }}</td>
+                  <td class="text-center">
+                    <!-- Approve button (modal) -->
+                    <button class="btn btn-success btn-sm me-1" data-bs-toggle="modal" data-bs-target="#approve{{ a.id }}">
+                      <i class="bi bi-check-circle me-1"></i>Approve
+                    </button>
+                    <div class="modal fade" id="approve{{ a.id }}" tabindex="-1">
+                      <div class="modal-dialog">
+                        <form method="post" action="{% url 'approve_request' a.id %}" class="modal-content rounded-4">
+                          {% csrf_token %}
+                          <div class="modal-header bg-success text-white rounded-top-4">
+                            <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Approve Appointment</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body">
+                            <label class="form-label fw-bold">Confirmation message (required)</label>
+                            <textarea name="doctor_message" class="form-control rounded-3" required placeholder="See you at the scheduled time."></textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <button class="btn btn-success px-4 rounded-pill">
+                              <i class="bi bi-check2 me-1"></i>Approve
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
 
-      </td>
-    </tr>
-  {% empty %}
-    <tr><td colspan="4">No pending requests.</td></tr>
-  {% endfor %}
-</table>
+                    <!-- Reject button (modal) -->
+                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reject{{ a.id }}">
+                      <i class="bi bi-x-circle me-1"></i>Reject
+                    </button>
+                    <div class="modal fade" id="reject{{ a.id }}" tabindex="-1">
+                      <div class="modal-dialog">
+                        <form method="post" action="{% url 'reject_request' a.id %}" class="modal-content rounded-4">
+                          {% csrf_token %}
+                          <div class="modal-header bg-danger text-white rounded-top-4">
+                            <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Reject Appointment</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body">
+                            <label class="form-label fw-bold">Reason (required)</label>
+                            <textarea name="rejection_message" class="form-control rounded-3" required placeholder="Not available at that time."></textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <button class="btn btn-danger px-4 rounded-pill">
+                              <i class="bi bi-x-lg me-1"></i>Reject
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-3">
+                    <i class="bi bi-inbox fs-4 d-block mb-2"></i>No pending requests.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Icons -->
+{% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"> {% endcomment %}
+
 {% endblock %}
+
+

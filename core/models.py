@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.utils import timezone
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, blank=True)  # override to remove unique
@@ -42,6 +42,7 @@ class Appointment(models.Model):
         ("PENDING", "Pending"),
         ("APPROVED", "Approved"),
         ("REJECTED", "Rejected"),
+        # ("OUTDATED", "Outdated"),
     )
     patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)
@@ -52,13 +53,20 @@ class Appointment(models.Model):
     rejection_message = models.TextField(blank=True)
 
 
+
+    @property
+    def is_outdated(self):
+        return self.date < timezone.now() and self.status == "PENDING"
+
+
     # 👇 check if patient has other approved appointment at same time
     def has_conflict(self):
+        appointment_date = self.date.date()  # get only the date part
         return Appointment.objects.filter(
             patient=self.patient,
-            doctor=self.doctor,   # ensure same doctor
-            date=self.date,
-            status__in=["PENDING", "APPROVED"]  # prevent multiple requests for same slot
+            doctor=self.doctor,   # only same doctor
+            date__date=appointment_date,
+            status__in=["PENDING", "APPROVED"]
         ).exclude(id=self.id).exists()
 
 

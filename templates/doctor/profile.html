@@ -1,9 +1,50 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>My Profile</h3>
-<p><b>Name:</b> {{ request.user.first_name }}</p>
-<p><b>Email:</b> {{ request.user.email }}</p>
-<p><b>Specialization:</b> {{ profile.specialization }}</p>
-<p><b>Availability:</b> {{ profile.availability|default:"—" }}</p>
-<a class="btn btn-outline-primary" href="{% url 'doctor_profile_edit' %}">Edit</a>
+{% include "includes/nav_doc.html" %}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 p-4">
+      <!-- Header -->
+      <div class="text-center mb-4">
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3"
+             style="width:80px; height:80px; font-size:32px;">
+          {{ request.user.username|slice:":1"|upper }}
+        </div>
+        <h3 class="fw-bold mb-0">{{ request.user.username|title }}</h3>
+        <small class="text-muted">Doctor Profile</small>
+      </div>
+  
+      <!-- Profile Details -->
+      <div class="row text-center">
+        <div class="col-md-6 mb-3">
+          <div class="p-3 border rounded bg-light h-100">
+            <p class="fw-bold mb-1">📧 Email</p>
+            <p class="mb-0 text-muted">{{ request.user.email }}</p>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="p-3 border rounded bg-light h-100">
+            <p class="fw-bold mb-1">🩺 Specialization</p>
+            <p class="mb-0 text-muted">{{ profile.specialization|default:"—" }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="row text-center">
+        <div class="col-md-12">
+          <div class="p-3 border rounded bg-light h-100">
+            <p class="fw-bold mb-1">📅 Availability</p>
+            <p class="mb-0 text-muted">{{ profile.availability|default:"—" }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Edit Button -->
+      <div class="text-center mt-4">
+        <a class="btn btn-primary px-4" href="{% url 'doctor_profile_edit' %}">
+          <i class="bi bi-pencil-square me-1"></i> Edit Profile
+        </a>
+      </div>
+    </div>
+  </div>
 {% endblock %}

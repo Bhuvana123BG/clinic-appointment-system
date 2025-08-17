@@ -37,13 +37,14 @@
               <div class="table-responsive">
                 <table class="table align-middle table-hover">
                   <thead class="table-light">
-                    <tr><th>Doctor</th><th>Date</th><th>Message</th></tr>
+                    <tr><th>Doctor</th><th>Date</th><th>reason</th><th>Message</th></tr>
                   </thead>
                   <tbody>
                     {% for a in approved %}
                       <tr>
-                        <td>Dr. {{ a.doctor.user.first_name|default:a.doctor.user.email }}</td>
+                        <td>Dr. {{ a.doctor.user.username|title}}</td>
                         <td>{{ a.date }}</td>
+                        <td>{{a.reason}}</td>
                         <td>{{ a.doctor_message|default:"—" }}</td>
                       </tr>
                     {% endfor %}
@@ -71,9 +72,15 @@
                   <tbody>
                     {% for a in pending %}
                       <tr>
-                        <td>Dr. {{ a.doctor.user.first_name|default:a.doctor.user.email }}</td>
+                        <td>Dr. {{ a.doctor.user.username |title}}</td>
                         <td>{{ a.date }}</td>
                         <td>{{ a.reason|default:"—" }}</td>
+                        <td> {% if a.patient.user == request.user %}
+                            <a href="{% url 'edit_appointment' a.id %}" class="btn btn-outline-primary btn-sm">
+                              <i class="bi bi-pencil"></i> Edit
+                            </a>
+                          {% endif %}
+                        </td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -100,7 +107,7 @@
                   <tbody>
                     {% for a in rejected %}
                       <tr>
-                        <td>Dr. {{ a.doctor.user.first_name|default:a.doctor.user.email }}</td>
+                        <td>Dr. {{ a.doctor.user.username|title}}</td>
                         <td>{{ a.date }}</td>
                         <td>{{ a.rejection_message|default:"—" }}</td>
                       </tr>

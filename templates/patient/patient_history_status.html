@@ -15,6 +15,15 @@
                 <h5 class="mb-1">🩺 Dr. {{ appointment.doctor.user.first_name|default:appointment.doctor.user.username|title }}</h5>
                 <p class="mb-1 text-muted"><strong>Reason:</strong> {{ appointment.reason }}</p>
                 <p class="mb-1 text-muted"><strong>Date:</strong> {{ appointment.date }}</p>
+                <p> {% if status == "PENDING" %}
+                    <td>
+                        {% if appointment.patient.user == request.user %}
+                        <a href="{% url 'edit_appointment' appointment.id %}" class="btn btn-outline-primary btn-sm">
+                          <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        {% endif %}
+                    </td>
+                  {% endif %}</p>
               </div>
               <div>
                 {% if appointment.status == "APPROVED" %}

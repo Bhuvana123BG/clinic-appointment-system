@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include "includes/nav_pat.html" %}
+<div class="container my-5">
+  <h3>Edit Appointment with Dr. {{ appointment.doctor.user.username|title }}</h3>
+  
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Date & Time</label>
+      <input type="datetime-local" name="date" class="form-control"
+             value="{{ appointment.date|date:'Y-m-d\TH:i' }}"
+             min="{{ now|date:'Y-m-d\TH:i' }}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Reason</label>
+      <textarea name="reason" class="form-control" rows="3" required>{{ appointment.reason }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Request</button>
+    <a href="{% url 'patient_dashboard' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}
