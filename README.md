@@ -1,4 +1,3 @@
-readme_content = """
 # 🏥 Django Medical Appointment System
 
 A full-stack Django web application where **patients** can register and request appointments with **doctors**, and **doctors** can manage and respond to these requests.
@@ -21,8 +20,8 @@ This project uses Django for both the backend and the frontend. You can run ever
 1. **Clone the Repository:**
 
     ```bash
-    git clone https://github.com/your-username/medical-appointment-system.git
-    cd medical-appointment-system
+    git clone https://github.com/Bhuvana123BG/clinic-appointment-system.git
+    cd clinic-appointment-system
     ```
 
 2. **Set Up Virtual Environment:**
