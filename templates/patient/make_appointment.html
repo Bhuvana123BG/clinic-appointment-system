@@ -65,7 +65,7 @@
                 <div class="modal-body">
                   <div class="mb-3">
                     <label class="form-label fw-bold">Select Date & Time</label>
-                    <input type="datetime-local" name="date" class="form-control" required>
+                    <input type="datetime-local" name="date" class="form-control" value="{{ now }}" min="{{ now }}"required>
                   </div>
                   <div class="mb-3">
                     <label class="form-label fw-bold">Reason for Appointment</label>
