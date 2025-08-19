@@ -10,8 +10,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
-SECRET_KEY = "django-insecure-%dqo1kag6&$v@r&k$4!8m)yw+4d%5i*-z!9&sc$nsq=h-cjsw6"
-
+SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
