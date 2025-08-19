@@ -7,7 +7,7 @@ SECRET_KEY = "django-insecure-%dqo1kag6&$v@r&k$4!8m)yw+4d%5i*-z!9&sc$nsq=h-cjsw6
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["medibook.onrender.com"]
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
