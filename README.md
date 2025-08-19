@@ -27,8 +27,8 @@ This project uses Django for both the backend and the frontend. You can run ever
 2. **Set Up Virtual Environment:**
 
     ```bash
-    python -m venv venv
-    source venv/bin/activate  # Windows: venv\\Scripts\\activate
+    python -m venv virtual
+    source virtual/bin/activate  # Windows: virtual\\Scripts\\activate
     ```
 
 3. **Install Dependencies:**
