@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: medibook-isu9
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: medibook.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
