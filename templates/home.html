@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-
 {% include "includes/navbar.html"%}
 {% include "includes/messages.html" %}
 <!-- Hero Section -->
@@ -10,12 +9,9 @@
     <a href="{% url 'patient_login' %}" class="btn btn-light btn-lg m-2">Patient Login</a>
     <a href="{% url 'doctor_login' %}" class="btn btn-dark btn-lg m-2">Doctor Login</a>
 </div>
-
-
 <!-- Role Cards Section -->
 <div class="container my-5">
     <div class="row text-center">
-        <!-- Patient Card -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-lg border-0 h-100">
                 <div class="card-body">
@@ -25,8 +21,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Doctor Card -->
         <div class="col-md-6 mb-4">
             <div class="card shadow-lg border-0 h-100">
                 <div class="card-body">

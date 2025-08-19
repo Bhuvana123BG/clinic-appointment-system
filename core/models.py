@@ -3,8 +3,8 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 class User(AbstractUser):
-    username = models.CharField(max_length=150, blank=True)  # override to remove unique
-    email = models.EmailField(unique=True)  # login field
+    username = models.CharField(max_length=150, blank=True)  
+    email = models.EmailField(unique=True)  
 
     ROLE_CHOICES = (
         ("PATIENT", "Patient"),
@@ -12,8 +12,8 @@ class User(AbstractUser):
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="PATIENT")
 
-    USERNAME_FIELD = "email"        # login with email
-    REQUIRED_FIELDS = ["username"]  # username will store full name
+    USERNAME_FIELD = "email"        
+    REQUIRED_FIELDS = ["username"]  
 
     def __str__(self):
         return f"{self.username} ({self.email} - {self.role})"
@@ -42,7 +42,6 @@ class Appointment(models.Model):
         ("PENDING", "Pending"),
         ("APPROVED", "Approved"),
         ("REJECTED", "Rejected"),
-        # ("OUTDATED", "Outdated"),
     )
     patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)
@@ -59,12 +58,11 @@ class Appointment(models.Model):
         return self.date < timezone.now() and self.status == "PENDING"
 
 
-    # 👇 check if patient has other approved appointment at same time
     def has_conflict(self):
-        appointment_date = self.date.date()  # get only the date part
+        appointment_date = self.date.date()  
         return Appointment.objects.filter(
             patient=self.patient,
-            doctor=self.doctor,   # only same doctor
+            doctor=self.doctor,   
             date__date=appointment_date,
             status__in=["PENDING", "APPROVED"]
         ).exclude(id=self.id).exists()

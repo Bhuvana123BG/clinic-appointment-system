@@ -2,8 +2,6 @@
 {% block content %}
 {% include "includes/nav_pat.html" %}
 <div class="container my-4">
-
-  <!-- Search -->
   <h3 class="fw-bold text-primary text-center mb-4">🔍 Find a Doctor</h3>
   
   <form method="get" class="row justify-content-center mb-4">
@@ -14,15 +12,11 @@
       </div>
     </div>
   </form>
-
-  <!-- Doctor List -->
   <div class="row justify-content-center">
     <div class="col-lg-8">
       {% for doctor in doctors %}
         <div class="card shadow-sm border-0 mb-3">
           <div class="card-body d-flex align-items-center justify-content-between p-4">
-
-            <!-- Avatar + Info -->
             <div class="d-flex align-items-center">
               <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
                    style="width:60px; height:60px; font-size:20px;">
@@ -38,8 +32,6 @@
                 {% endif %}
               </div>
             </div>
-
-            <!-- Actions -->
             <div class="text-end">
               <a class="btn btn-outline-secondary btn-sm me-2" href="{% url 'doctor_detail' doctor.id %}">
                 View Details
@@ -51,8 +43,6 @@
 
           </div>
         </div>
-
-        <!-- Modal for each doctor -->
         <div class="modal fade" id="requestModal{{ doctor.id }}" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">

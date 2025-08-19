@@ -11,12 +11,7 @@ from django.utils.dateparse import parse_datetime
 from datetime import datetime
 import pytz
 
-
-
-#timezone
 india_tz = pytz.timezone('Asia/Kolkata')
-
-# ---------- Public ----------
 def home(request):
     return render(request, 'home.html')
 
@@ -24,10 +19,8 @@ def home(request):
 def update_outdated_appointments():
 
     now = timezone.now().astimezone(india_tz)
-    # print("check",now)
     Appointment.objects.filter(Q(status='PENDING') & Q(date__lt=now)).update(status='REJECTED', rejection_message="Time passed, auto-rejected.")
 
-# ---------- Auth (manual forms) ---------- 
 def patient_register(request):
     if request.method == 'POST':
         full_name = request.POST.get('username', '').strip()
@@ -41,16 +34,12 @@ def patient_register(request):
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered.')
             return redirect('patient_register')
-
-        # create user
         user = User.objects.create_user(
             email=email,
             password=pwd1,
             role='PATIENT',
-            username=full_name  # ✅ store full name in username
+            username=full_name 
         )
-
-        # create an empty patient profile
         PatientProfile.objects.create(user=user)
 
         messages.success(request, 'Account created. Please log in.')
@@ -102,11 +91,7 @@ def post_login(request):
 def patient_dashboard(request):
     if request.user.role != 'PATIENT':
         return redirect('doctor_dashboard')
-
-    #update db
     update_outdated_appointments()
-
-    # quick counts
     profile = PatientProfile.objects.get(user=request.user)
     counts = Appointment.objects.filter(patient=profile).values('status').annotate(c=Count('id'))
     by_status = {row['status']: row['c'] for row in counts}
@@ -166,8 +151,6 @@ def request_appointment(request, doctor_id):
     # Ensure only patients can request
     if request.user.role != 'PATIENT':
         return redirect('doctor_dashboard')
-
-    # Get the doctor
     doctor = get_object_or_404(DoctorProfile.objects.select_related('user'), pk=doctor_id)
 
     # Ensure the patient profile exists
@@ -178,9 +161,6 @@ def request_appointment(request, doctor_id):
     if request.method == "POST":
         raw_date = request.POST.get("date")
         reason = request.POST.get("reason")
-
-        # print("raw",raw_date)
-        # Convert string -> naive datetime
         date = parse_datetime(raw_date)
 
 
@@ -189,13 +169,9 @@ def request_appointment(request, doctor_id):
             return redirect("doctor_detail", doctor_id=doctor.id)
 
         date = date.astimezone(india_tz)
-
-        # Check that date is in the future
         if date <= now:
             messages.error(request, "Please select a future date and time.")
             return redirect("doctor_detail", doctor_id=doctor.id)
-
-        # Create appointment instance (not saved yet)
         appointment = Appointment(
             doctor=doctor,
             patient=patient_profile,
@@ -212,8 +188,6 @@ def request_appointment(request, doctor_id):
             messages.success(request, "Your appointment request has been submitted!")
 
         return redirect("doctor_detail", doctor_id=doctor.id)
-
-    # Render the doctor detail page with current datetime for modal
     return render(request, "doctor_details.html", {
         "doctor": doctor,
         "now": now
@@ -228,7 +202,7 @@ def patient_history(request):
     patient = PatientProfile.objects.get(user=request.user)
     
     update_outdated_appointments()
-    # Fetch all 3 categories
+
     approved = Appointment.objects.filter(
         patient=patient, status='APPROVED'
     ).select_related('doctor__user').order_by('-date')
@@ -255,8 +229,7 @@ def patient_history_status(request, status):
     update_outdated_appointments()
 
     """Show only appointments of a specific status for the logged-in patient."""
-    status_upper = status.upper()  # 'pending' -> 'PENDING'
-
+    status_upper = status.upper() 
     # Ensure valid status
     if status_upper not in ["PENDING", "APPROVED", "REJECTED"]:
         status_upper = "PENDING"
@@ -286,7 +259,6 @@ def patient_profile_edit(request):
         return redirect('doctor_dashboard')
     profile = PatientProfile.objects.get(user=request.user)
     if request.method == 'POST':
-        # Update user's display name + email
         request.user.first_name = request.POST.get('name', request.user.first_name)
         new_email = request.POST.get('email', request.user.email).lower().strip()
         if new_email != request.user.email and User.objects.filter(email=new_email).exists():
@@ -295,7 +267,6 @@ def patient_profile_edit(request):
         request.user.email = new_email
         request.user.save()
 
-        # Update profile
         profile.phone = request.POST.get('phone', profile.phone)
         profile.address = request.POST.get('address', profile.address)
         profile.save()
@@ -310,40 +281,29 @@ def patient_profile_edit(request):
 def edit_appointment(request, appointment_id):
 
     update_outdated_appointments()
-
-    # Ensure only the patient who owns the appointment can edit
     appointment = get_object_or_404(Appointment, id=appointment_id)
     if request.user.role != 'PATIENT' or appointment.patient.user != request.user:
         messages.error(request, "You are not allowed to edit this appointment.")
         return redirect('patient_history')
-
-    # Only allow editing if the appointment is still pending
     if appointment.status != "PENDING":
         messages.error(request, "You cannot edit this appointment as it is already processed.")
         return redirect('patient_history')
 
-    now =timezone.now().astimezone(india_tz) # timezone-aware current datetime
+    now =timezone.now().astimezone(india_tz)\
     
     if request.method == "POST":
         raw_date = request.POST.get("date")
         reason = request.POST.get("reason")
-
-        # Parse datetime-local string (e.g. "2025-08-17T14:30")
         try:
             new_date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M")
         except (TypeError, ValueError):
             messages.error(request, "Invalid date format.")
             return redirect('edit_appointment', appointment_id=appointment.id)
-
-        # Make it timezone-aware
         new_date = new_date.astimezone(india_tz)
-
-        # Prevent past dates
         if new_date <= now:
             messages.error(request, "Please select a future date and time.")
             return redirect('edit_appointment', appointment_id=appointment.id)
 
-        # Check conflicts with the same doctor (same day)
         conflict_exists = Appointment.objects.filter(
             patient=appointment.patient,
             doctor=appointment.doctor,
@@ -354,15 +314,12 @@ def edit_appointment(request, appointment_id):
         if conflict_exists:
             messages.error(request, "You already have an appointment with this doctor on the same day.")
             return redirect('edit_appointment', appointment_id=appointment.id)
-
-        # Save updated appointment
         appointment.date = new_date
         appointment.reason = reason
         appointment.save()
         messages.success(request, "Your appointment request has been updated!")
         return redirect('patient_history')
 
-    # --- default value for input ---
     if appointment.date > now:
         default_value = appointment.date.strftime("%Y-%m-%dT%H:%M")
     else:
@@ -370,8 +327,8 @@ def edit_appointment(request, appointment_id):
 
     return render(request, "patient/edit_appointment.html", {
         "appointment": appointment,
-        "now": now.strftime("%Y-%m-%dT%H:%M"),  # min
-        "default_value": default_value           # input value
+        "now": now.strftime("%Y-%m-%dT%H:%M"), 
+        "default_value": default_value           
     })
 
 # ---------- Doctor Side ----------
@@ -383,8 +340,6 @@ def doctor_dashboard(request):
     doc = DoctorProfile.objects.get(user=request.user)
 
     update_outdated_appointments()
-    
-    # total_patients = Appointment.objects.filter(doctor=doc).values('patient').distinct().count()
     pending = Appointment.objects.filter(doctor=doc, status='PENDING').count()
     approved = Appointment.objects.filter(doctor=doc, status='APPROVED').count()
     rejected = Appointment.objects.filter(doctor=doc, status='REJECTED').count()
@@ -392,7 +347,6 @@ def doctor_dashboard(request):
     upcoming = Appointment.objects.filter(doctor=doc, status='APPROVED', date__gte=timezone.now()).order_by('date').first()
 
     return render(request, 'doctor/dashboard.html', {
-        # 'total_patients': total_patients,
         'pending': pending,
         'approved': approved,
         'rejected': rejected,
@@ -459,7 +413,6 @@ def doctor_history(request):
 
     update_outdated_appointments()
     
-    # Appointments by status
     pending = Appointment.objects.filter(doctor=doc, status='PENDING').select_related('patient__user').order_by('-date')
     approved = Appointment.objects.filter(doctor=doc, status='APPROVED').select_related('patient__user').order_by('-date')
     rejected = Appointment.objects.filter(doctor=doc, status='REJECTED').select_related('patient__user').order_by('-date')
@@ -517,7 +470,6 @@ def doctor_profile_edit(request):
         return redirect('patient_dashboard')
     profile = DoctorProfile.objects.get(user=request.user)
     if request.method == 'POST':
-        # Store doctor display name in user.first_name (simple & already present)
         request.user.first_name = request.POST.get('name', request.user.first_name)
         new_email = request.POST.get('email', request.user.email).lower().strip()
         if new_email != request.user.email and User.objects.filter(email=new_email).exists():

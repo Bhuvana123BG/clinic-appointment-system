@@ -1,19 +1,12 @@
 <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
     <div class="container-fluid">
-      <!-- Brand / Username -->
       <a class="navbar-brand fw-bold" href="{% url 'patient_dashboard'%}">{{ user.username|title }}</a>
-  
-      <!-- Left Links -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="{% url 'patient_dashboard'%}">Home</a>
         </li>
       </ul>
-  
-      <!-- Right Side -->
       <ul class="navbar-nav mb-2 mb-lg-0">
-  
-        <!-- Profile Dropdown -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-person-circle me-1"></i> Profile
@@ -24,8 +17,6 @@
             <li><a class="dropdown-item" href="{% url 'patient_history' %}">Appointment History</a></li>
           </ul>
         </li>
-  
-        <!-- Logout -->
         <li class="nav-item ms-3">
           <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}

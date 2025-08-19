@@ -5,7 +5,6 @@
 
 <div class="container mt-5">
     <div class="card shadow-lg border-0 p-4">
-      <!-- Header -->
       <div class="text-center mb-4">
         <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3"
              style="width:80px; height:80px; font-size:32px;">
@@ -14,8 +13,6 @@
         <h3 class="fw-bold mb-0">{{ request.user.username|title }}</h3>
         <small class="text-muted">Doctor Profile</small>
       </div>
-  
-      <!-- Profile Details -->
       <div class="row text-center">
         <div class="col-md-6 mb-3">
           <div class="p-3 border rounded bg-light h-100">
@@ -39,8 +36,6 @@
           </div>
         </div>
       </div>
-  
-      <!-- Edit Button -->
       <div class="text-center mt-4">
         <a class="btn btn-primary px-4" href="{% url 'doctor_profile_edit' %}">
           <i class="bi bi-pencil-square me-1"></i> Edit Profile

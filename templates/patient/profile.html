@@ -1,22 +1,16 @@
 {% extends "base.html" %}
-
 {% block content %}
 {% include "includes/nav_pat.html" %}
 {% include "includes/messages.html" %}
-
-
 <div class="container py-5 bg-light">
   <div class="row justify-content-center">
     <div class="col-md-5">
-      <!-- Profile Card -->
       <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white d-flex align-items-center rounded-top-4">
           <i class="bi bi-person-circle fs-3 me-2"></i>
           <h4 class="mb-0">My Profile</h4>
         </div>
         <div class="card-body p-4 bg-white rounded-bottom-4">
-
-          <!-- Info Row -->
           <div class="d-flex justify-content-between align-items-center p-3 border rounded-3 mb-3">
             <div class="fw-bold text-muted">
               <i class="bi bi-person text-primary me-2"></i>Name
@@ -44,8 +38,6 @@
             </div>
             <div class="text-dark">{{ profile.address|default:"—" }}</div>
           </div>
-
-          <!-- Edit Button -->
           <div class="text-end mt-4">
             <a class="btn btn-primary px-4 rounded-pill" href="{% url 'patient_profile_edit' %}">
               <i class="bi bi-pencil-square me-2"></i>Edit Profile
@@ -57,7 +49,4 @@
     </div>
   </div>
 </div>
-
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 {% endblock %}
