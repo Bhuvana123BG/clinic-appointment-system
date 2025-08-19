@@ -5,7 +5,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Create working directory
+# Set work directory
 WORKDIR /core
 
 # Install dependencies
@@ -15,12 +15,11 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy project files
 COPY . .
 
-# Collect static files
+# Collect static files (this will now work)
 RUN python manage.py collectstatic --noinput
 
-# Expose port (Render will set $PORT)
+# Expose the port (Render sets $PORT)
 EXPOSE 8000
 
-# Run app with gunicorn
-# CMD gunicorn medibook.wsgi:application  --bind 0.0.0.0:$PORT
-CMD bash -c "python manage.py migrate && gunicorn medibook.wsgi:application --bind 0.0.0.0:$PORT"
+# Start the app
+CMD bash -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn medibook.wsgi:application --bind 0.0.0.0:$PORT"

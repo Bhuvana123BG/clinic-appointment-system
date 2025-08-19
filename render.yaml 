@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: medibook-isu9
+    name: django-template-app
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: medibook.settings
+        value: myproject.settings  # 👈 Replace with your actual project name
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
