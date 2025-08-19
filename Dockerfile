@@ -22,4 +22,5 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Run app with gunicorn
-CMD gunicorn medibook.wsgi:application --chdir backend --bind 0.0.0.0:$PORT
+# CMD gunicorn medibook.wsgi:application  --bind 0.0.0.0:$PORT
+CMD bash -c "python manage.py migrate && gunicorn medibook.wsgi:application --bind 0.0.0.0:$PORT"
