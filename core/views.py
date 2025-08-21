@@ -259,7 +259,7 @@ def patient_profile_edit(request):
         return redirect('doctor_dashboard')
     profile = PatientProfile.objects.get(user=request.user)
     if request.method == 'POST':
-        request.user.first_name = request.POST.get('name', request.user.first_name)
+        request.user.username = request.POST.get('name', request.user.username)
         new_email = request.POST.get('email', request.user.email).lower().strip()
         if new_email != request.user.email and User.objects.filter(email=new_email).exists():
             messages.error(request, 'Email already in use.')
@@ -470,7 +470,7 @@ def doctor_profile_edit(request):
         return redirect('patient_dashboard')
     profile = DoctorProfile.objects.get(user=request.user)
     if request.method == 'POST':
-        request.user.first_name = request.POST.get('name', request.user.first_name)
+        request.user.username = request.POST.get('name', request.user.username)
         new_email = request.POST.get('email', request.user.email).lower().strip()
         if new_email != request.user.email and User.objects.filter(email=new_email).exists():
             messages.error(request, 'Email already in use.')
