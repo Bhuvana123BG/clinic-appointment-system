@@ -1,6 +1,10 @@
-# 🏥 Django Medical Appointment System
-
+# 🏥 Django Clinic Appointment System
 A full-stack Django web application where **patients** can register and request appointments with **doctors**, and **doctors** can manage and respond to these requests.
+
+---
+
+## 🌐 Live Demo
+👉 [Try it on Render](https://medibook-qrwc.onrender.com)  
 
 ---
 
