@@ -22,21 +22,28 @@ def is_admin(user):
 def admin_dashboard(request):
     pending_doctors = User.objects.filter(role="DOCTOR", is_approved=False)
     return render(request, "auth/admin_dashboard.html", {"pending_doctors": pending_doctors})
+
+
 @login_required
 @user_passes_test(is_admin)
 def approve_doctor(request, doctor_id):
     doctor = User.objects.get(id=doctor_id, role="DOCTOR")
-    doctor.is_approved = True     # custom flag
-    doctor.is_active = True       # required for login
+    doctor.is_approved = True     
+    doctor.is_active = True       
     doctor.save()
     return redirect("admin_dashboard")
+
+
 @login_required
 @user_passes_test(is_admin)
 def reject_doctor(request, doctor_id):
     doctor = User.objects.get(id=doctor_id, role="DOCTOR")
     doctor.delete()
     return redirect("admin_dashboard")
+
+
 india_tz = pytz.timezone('Asia/Kolkata')
+
 def home(request):
     return render(request, 'home.html')
 
@@ -56,15 +63,18 @@ def patient_register(request):
         if pwd1 != pwd2:
             messages.error(request, 'Passwords do not match.')
             return redirect('patient_register')
+        
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered.')
             return redirect('patient_register')
+        
         user = User.objects.create_user(
             email=email,
             password=pwd1,
             role='PATIENT',
             username=full_name 
         )
+       
         PatientProfile.objects.create(user=user)
 
         messages.success(request, 'Account created. Please log in.')
@@ -78,9 +88,11 @@ def patient_login(request):
         email = request.POST.get('email', '').lower().strip()
         password = request.POST.get('password')
         user = authenticate(request, username=email, password=password)
+        
         if user and user.role == 'PATIENT':
             login(request, user)
             return redirect('patient_dashboard')
+        
         messages.error(request, 'Invalid credentials for patient login.')
         return redirect('patient_login')
     return render(request, 'auth/patient_login.html')
@@ -104,7 +116,7 @@ def doctor_register(request):
             password=password,
             role="DOCTOR",
             is_active=False,    # inactive until admin approval
-            is_approved=False   # custom flag
+            is_approved=False   
         )
 
         DoctorProfile.objects.create(user=user, specialization=specialization,availability=availability)
@@ -174,6 +186,7 @@ def patient_dashboard(request):
         status="APPROVED",
         date__gte=now()
     ).order_by("date").first()
+    
     return render(request, 'patient/dashboard.html', {'by_status': by_status,"upcoming": upcoming})
 
 
@@ -221,13 +234,13 @@ def doctor_detail(request, doctor_id):
 
 @login_required
 def request_appointment(request, doctor_id):
-    # Ensure only patients can request
+
     if request.user.role != 'PATIENT':
         return redirect('doctor_dashboard')
 
     doctor = get_object_or_404(DoctorProfile.objects.select_related('user'), pk=doctor_id)
 
-    # Ensure patient profile exists
+   
     patient_profile, created = PatientProfile.objects.get_or_create(user=request.user)
 
     now = timezone.now().astimezone(india_tz)
@@ -269,12 +282,7 @@ def request_appointment(request, doctor_id):
             status="PENDING"
         )
 
-        #  # ✅ Check if doctor is available on that day
-        # if not doctor.is_available_on(date):
-        #     messages.error(request, "Doctor is not available on this day. Please select another day.")
-        #     return redirect("doctor_detail", doctor_id=doctor.id)
-
-
+        
         # --- Check conflicts ---
         conflict = appointment.has_conflict()
 
@@ -367,17 +375,21 @@ def patient_profile_edit(request):
     if request.user.role != 'PATIENT':
         return redirect('doctor_dashboard')
     profile = PatientProfile.objects.get(user=request.user)
+    
     if request.method == 'POST':
         request.user.username = request.POST.get('name', request.user.username)
         new_email = request.POST.get('email', request.user.email).lower().strip()
+        
         if new_email != request.user.email and User.objects.filter(email=new_email).exists():
             messages.error(request, 'Email already in use.')
             return redirect('patient_profile_edit')
         request.user.email = new_email
+       
         request.user.save()
 
         profile.phone = request.POST.get('phone', profile.phone)
         profile.address = request.POST.get('address', profile.address)
+        
         profile.save()
 
         messages.success(request, 'Profile updated.')
@@ -391,9 +403,11 @@ def edit_appointment(request, appointment_id):
 
     update_outdated_appointments()
     appointment = get_object_or_404(Appointment, id=appointment_id)
+    
     if request.user.role != 'PATIENT' or appointment.patient.user != request.user:
         messages.error(request, "You are not allowed to edit this appointment.")
         return redirect('patient_history')
+    
     if appointment.status != "PENDING":
         messages.error(request, "You cannot edit this appointment as it is already processed.")
         return redirect('patient_history')
@@ -403,12 +417,15 @@ def edit_appointment(request, appointment_id):
     if request.method == "POST":
         raw_date = request.POST.get("date")
         reason = request.POST.get("reason")
+        
         try:
             new_date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M")
         except (TypeError, ValueError):
             messages.error(request, "Invalid date format.")
             return redirect('edit_appointment', appointment_id=appointment.id)
+        
         new_date = new_date.astimezone(india_tz)
+        
         if new_date <= now:
             messages.error(request, "Please select a future date and time.")
             return redirect('edit_appointment', appointment_id=appointment.id)
@@ -423,6 +440,7 @@ def edit_appointment(request, appointment_id):
         if conflict_exists:
             messages.error(request, "You already have an appointment with this doctor on the same day.")
             return redirect('edit_appointment', appointment_id=appointment.id)
+        
         appointment.date = new_date
         appointment.reason = reason
         appointment.save()
@@ -431,6 +449,7 @@ def edit_appointment(request, appointment_id):
 
     if appointment.date > now:
         default_value = appointment.date.strftime("%Y-%m-%dT%H:%M")
+   
     else:
         default_value = now.strftime("%Y-%m-%dT%H:%M")
 
@@ -467,6 +486,7 @@ def doctor_dashboard(request):
 def doctor_requests(request):
     if request.user.role != 'DOCTOR':
         return redirect('patient_dashboard')
+    
     doc = DoctorProfile.objects.get(user=request.user)
 
     update_outdated_appointments()
@@ -477,10 +497,6 @@ def doctor_requests(request):
 
 
 def reject_conflicting_appointments(approved_appt):
-    """
-    Reject pending appointments for the same doctor that overlap
-    with the given approved appointment within ±30 minutes.
-    """
     pending_appointments = Appointment.objects.filter(
         status="PENDING",
         doctor_id=approved_appt.doctor_id,
@@ -493,6 +509,7 @@ def reject_conflicting_appointments(approved_appt):
         pending.rejection_message = (
             "Rejected due to conflict with another approved appointment."
         )
+
         pending.save()
 @login_required
 def approve_request(request, appt_id):
@@ -502,6 +519,7 @@ def approve_request(request, appt_id):
     update_outdated_appointments()
 
     appt = get_object_or_404(Appointment, pk=appt_id, doctor__user=request.user, status='PENDING')
+    
     if request.method == 'POST':
         msg = request.POST.get('doctor_message', '').strip()
         appt.status = 'APPROVED'
@@ -510,6 +528,7 @@ def approve_request(request, appt_id):
         appt.save()
         messages.success(request, 'Appointment approved.')
         reject_conflicting_appointments(appt)
+    
     return redirect('doctor_requests')
 
 
@@ -520,11 +539,14 @@ def reject_request(request, appt_id):
     
     update_outdated_appointments()
     appt = get_object_or_404(Appointment, pk=appt_id, doctor__user=request.user, status='PENDING')
+   
     if request.method == 'POST':
         reason = request.POST.get('rejection_message', '').strip()
+        
         if not reason:
             messages.error(request, 'Please provide a rejection reason.')
             return redirect('doctor_requests')
+        
         appt.status = 'REJECTED'
         appt.rejection_message = reason
         appt.doctor_message = ''
@@ -567,12 +589,15 @@ def doctor_history_status(request, status=None):
     if status_lower == 'pending':
         appointments = Appointment.objects.filter(doctor=doc, status='PENDING').select_related('patient__user').order_by('-date')
         title = "Pending Appointments"
+   
     elif status_lower == 'approved':
         appointments = Appointment.objects.filter(doctor=doc, status='APPROVED').select_related('patient__user').order_by('-date')
         title = "Approved Appointments"
+   
     elif status_lower == 'rejected':
         appointments = Appointment.objects.filter(doctor=doc, status='REJECTED').select_related('patient__user').order_by('-date')
         title = "Rejected Appointments"
+    
     else:
         appointments = Appointment.objects.filter(doctor=doc).select_related('patient__user').order_by('-date')
         title = "All Appointments"
@@ -589,6 +614,7 @@ def doctor_history_status(request, status=None):
 def doctor_profile(request):
     if request.user.role != 'DOCTOR':
         return redirect('patient_dashboard')
+   
     profile = DoctorProfile.objects.get(user=request.user)
     return render(request, 'doctor/profile.html', {'profile': profile})
 
@@ -597,13 +623,17 @@ def doctor_profile(request):
 def doctor_profile_edit(request):
     if request.user.role != 'DOCTOR':
         return redirect('patient_dashboard')
+   
     profile = DoctorProfile.objects.get(user=request.user)
+    
     if request.method == 'POST':
         request.user.username = request.POST.get('name', request.user.username)
         new_email = request.POST.get('email', request.user.email).lower().strip()
+        
         if new_email != request.user.email and User.objects.filter(email=new_email).exists():
             messages.error(request, 'Email already in use.')
             return redirect('doctor_profile_edit')
+        
         request.user.email = new_email
         request.user.save()
 

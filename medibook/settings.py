@@ -11,7 +11,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -107,6 +107,6 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-LOGIN_URL = 'patient_login'       
+LOGIN_URL = '/'       
 LOGIN_REDIRECT_URL = 'post_login'
 LOGOUT_REDIRECT_URL = 'home'
