@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from datetime import datetime, timedelta
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, blank=True)  
@@ -11,6 +12,7 @@ class User(AbstractUser):
         ("DOCTOR", "Doctor"),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="PATIENT")
+    is_approved = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"        
     REQUIRED_FIELDS = ["username"]  
@@ -58,14 +60,69 @@ class Appointment(models.Model):
         return self.date < timezone.now() and self.status == "PENDING"
 
 
+    # def has_conflict(self):
+    #     appointment_date = self.date.date()  
+    #     return Appointment.objects.filter(
+    #         patient=self.patient,
+    #         doctor=self.doctor,   
+    #         date__date=appointment_date,
+    #         status__in=["PENDING", "APPROVED"]
+    #     ).exclude(id=self.id).exists()
+
+
     def has_conflict(self):
-        appointment_date = self.date.date()  
-        return Appointment.objects.filter(
+        """
+        Check for conflicts:
+        1. Patient already has an appointment with this doctor on the same day.
+        2. Doctor has an appointment within ±30 minutes.
+        Returns:
+            None -> no conflict
+            dict -> details of conflict
+        """
+        # -------------------------
+        # 1) Same-day conflict (patient + doctor)
+        # -------------------------
+        start_of_day = self.date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = start_of_day + timedelta(days=1)
+
+        patient_conflict = Appointment.objects.filter(
+            doctor=self.doctor,
             patient=self.patient,
-            doctor=self.doctor,   
-            date__date=appointment_date,
+            date__gte=start_of_day,
+            date__lt=end_of_day,
             status__in=["PENDING", "APPROVED"]
-        ).exclude(id=self.id).exists()
+        ).exclude(id=self.id).first()
+
+        if patient_conflict:
+            return {
+                "type": "PATIENT_CONFLICT",
+                "doctor_name": self.doctor.user.username,
+                "date": patient_conflict.date
+            }
+
+        # -------------------------
+        # 2) Doctor overlapping conflict (±30 mins)
+        # -------------------------
+        start_time = self.date - timedelta(minutes=30)
+        end_time = self.date + timedelta(minutes=30)
+
+        doctor_conflict = Appointment.objects.filter(
+            doctor=self.doctor,
+            date__range=(start_time, end_time),
+            status="APPROVED"
+        ).exclude(id=self.id).first()
+
+        if doctor_conflict:
+            return {
+                "type": "DOCTOR_CONFLICT",
+                "doctor_name": self.doctor.user.username,
+                "date": doctor_conflict.date
+            }
+
+        # -------------------------
+        # No conflict
+        # -------------------------
+        return None
 
 
     def __str__(self):

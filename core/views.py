@@ -9,8 +9,33 @@ from django.http import JsonResponse
 from django.utils.timezone import now
 from django.utils.dateparse import parse_datetime
 from datetime import datetime
+from django.contrib.auth.decorators import user_passes_test
+
 import pytz
 
+
+def is_admin(user):
+    return user.is_superuser
+
+@login_required
+@user_passes_test(is_admin)
+def admin_dashboard(request):
+    pending_doctors = User.objects.filter(role="DOCTOR", is_approved=False)
+    return render(request, "auth/admin_dashboard.html", {"pending_doctors": pending_doctors})
+@login_required
+@user_passes_test(is_admin)
+def approve_doctor(request, doctor_id):
+    doctor = User.objects.get(id=doctor_id, role="DOCTOR")
+    doctor.is_approved = True     # custom flag
+    doctor.is_active = True       # required for login
+    doctor.save()
+    return redirect("admin_dashboard")
+@login_required
+@user_passes_test(is_admin)
+def reject_doctor(request, doctor_id):
+    doctor = User.objects.get(id=doctor_id, role="DOCTOR")
+    doctor.delete()
+    return redirect("admin_dashboard")
 india_tz = pytz.timezone('Asia/Kolkata')
 def home(request):
     return render(request, 'home.html')
@@ -60,18 +85,63 @@ def patient_login(request):
         return redirect('patient_login')
     return render(request, 'auth/patient_login.html')
 
+def doctor_register(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        specialization = request.POST.get("specialization")
 
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered")
+            return redirect("doctor_register")
+
+        user = User.objects.create_user(
+            username=name,   
+            email=email,
+            password=password,
+            role="DOCTOR",
+            is_active=False,    # inactive until admin approval
+            is_approved=False   # custom flag
+        )
+
+        DoctorProfile.objects.create(user=user, specialization=specialization)
+
+        messages.success(request, "Registration successful! Wait for admin approval.")
+        return redirect("doctor_login")
+
+    return render(request, "auth/doctor_register.html")
 def doctor_login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email', '').lower().strip()
-        password = request.POST.get('password')
-        user = authenticate(request, username=email, password=password)
-        if user and user.role == 'DOCTOR':
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        user = authenticate(request, email=email, password=password)
+
+        if user and user.role == "DOCTOR":
+            if user.is_active and user.is_approved:
+                login(request, user)
+                return redirect("doctor_dashboard")
+            else:
+                messages.error(request, "Your account is pending admin approval.")
+        else:
+            messages.error(request, "Invalid credentials")
+
+    return render(request, "auth/doctor_login.html")
+
+def admin_login(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        user = authenticate(request, email=email, password=password)
+
+        if user and user.is_superuser:
             login(request, user)
-            return redirect('doctor_dashboard')
-        messages.error(request, 'Invalid credentials for doctor login.')
-        return redirect('doctor_login')
-    return render(request, 'auth/doctor_login.html')
+            return redirect("admin_dashboard")
+        else:
+            messages.error(request, "Invalid credentials or not an admin")
+
+    return render(request, "auth/admin_login.html")
+    
 
 
 def logout_view(request):
@@ -145,15 +215,15 @@ def doctor_detail(request, doctor_id):
     })
 
 
-
 @login_required
 def request_appointment(request, doctor_id):
     # Ensure only patients can request
     if request.user.role != 'PATIENT':
         return redirect('doctor_dashboard')
+
     doctor = get_object_or_404(DoctorProfile.objects.select_related('user'), pk=doctor_id)
 
-    # Ensure the patient profile exists
+    # Ensure patient profile exists
     patient_profile, created = PatientProfile.objects.get_or_create(user=request.user)
 
     now = timezone.now().astimezone(india_tz)
@@ -163,7 +233,6 @@ def request_appointment(request, doctor_id):
         reason = request.POST.get("reason")
         date = parse_datetime(raw_date)
 
-
         if not date:
             messages.error(request, "Invalid date format.")
             return redirect("doctor_detail", doctor_id=doctor.id)
@@ -172,6 +241,7 @@ def request_appointment(request, doctor_id):
         if date <= now:
             messages.error(request, "Please select a future date and time.")
             return redirect("doctor_detail", doctor_id=doctor.id)
+
         appointment = Appointment(
             doctor=doctor,
             patient=patient_profile,
@@ -180,19 +250,33 @@ def request_appointment(request, doctor_id):
             status="PENDING"
         )
 
-        # Check conflict: one appointment per doctor per day
-        if appointment.has_conflict():
-            messages.error(request, "You already have an appointment today with this doctor. Cannot make another request.")
+        # --- Check conflicts ---
+        conflict = appointment.has_conflict()
+
+        if conflict:
+            if conflict["type"] == "PATIENT_CONFLICT":
+                messages.error(
+                    request,
+                    f"❌ You already have an appointment with Dr. {conflict['doctor_name']} on "
+                    f"{conflict['date'].strftime('%d %b %Y')}."
+                )
+            elif conflict["type"] == "DOCTOR_CONFLICT":
+                messages.error(
+                    request,
+                    f"❌ Dr. {conflict['doctor_name']} already has an appointment at this time. "
+                    f"Please choose another slot."
+                )
         else:
             appointment.save()
-            messages.success(request, "Your appointment request has been submitted!")
+            messages.success(request, "✅ Your appointment request has been submitted!")
+
 
         return redirect("doctor_detail", doctor_id=doctor.id)
+
     return render(request, "doctor_details.html", {
         "doctor": doctor,
         "now": now
     })
-
 
 @login_required
 def patient_history(request):

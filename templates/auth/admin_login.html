@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "includes/navbar.html" %}
+{% include "includes/messages.html" %}
+<style>
+    body {
+      background: linear-gradient(135deg, #f0f9ff, #c6f6d5);
+    }
+    .card {
+      border-radius: 20px;
+      transition: transform 0.2s ease-in-out;
+      width: 400px; /* reduced size */
+      padding: 1.5rem;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .register-link {
+      text-decoration: none !important;
+      font-weight: 500;
+      color: blue;
+    }
+    .register-link:hover {
+      color: green;
+    }
+      
+  </style>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-lg p-4 rounded-4" style="width: 100%; max-width: 400px;">
+    <h3 class="text-center mb-4 fw-bold text-primary">
+      <i class="bi bi-shield-lock"></i> Admin Login
+    </h3>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label for="email" class="form-label fw-semibold">Email</label>
+        <input 
+          type="email" 
+          class="form-control rounded-3 shadow-sm" 
+          id="email" 
+          name="email" 
+          placeholder="Enter your email" 
+          required>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label fw-semibold">Password</label>
+        <input 
+          type="password" 
+          class="form-control rounded-3 shadow-sm" 
+          id="password" 
+          name="password" 
+          placeholder="Enter your password" 
+          required>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary rounded-3 fw-semibold shadow-sm">
+          <i class="bi bi-box-arrow-in-right"></i> Login
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

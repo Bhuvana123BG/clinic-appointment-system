@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block content %}
 {% include "includes/navbar.html"%}
@@ -23,7 +24,7 @@
       color: green;
     }
   </style>
-  
+
   <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="card shadow-lg p-4" style="width: 400px;">
       <div class="text-center mb-3">
@@ -42,6 +43,10 @@
         <div class="d-grid">
           <button class="btn btn-primary">Login</button>
         </div>
+        <div class="text-center mt-3">
+            <span class="text-muted">Don’t have an account?</span>
+            <a href="{% url 'doctor_register' %}" class="register-link"> Register</a>
+          </div>
       </form>
     </div>
   </div>

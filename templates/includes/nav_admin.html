@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="{% url 'admin_dashboard'%}">{{ user.username|title }}</a>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'admin_dashboard'%}">Home</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav mb-2 mb-lg-0">
+        <li class="nav-item ms-3">
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger">Logout</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  

@@ -11,6 +11,7 @@ urlpatterns = [
     path('post-login/', views.post_login, name='post_login'),
      # Dashboards
     path('patient/dashboard/', views.patient_dashboard, name='patient_dashboard'),
+    path('doctor/register/', views.doctor_register, name='doctor_register'),
     path('doctor/dashboard/', views.doctor_dashboard, name='doctor_dashboard'),
     # Patient features
     path('patient/make-appointment/', views.make_appointment, name='make_appointment'),
@@ -32,4 +33,11 @@ urlpatterns = [
     # Doctor profile
     path('doctor/profile/', views.doctor_profile, name='doctor_profile'),
     path('doctor/profile/edit/', views.doctor_profile_edit, name='doctor_profile_edit'),
+
+    # Admin Routes
+    path('admin-login/', views.admin_login, name='admin_login'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin-approve/<int:doctor_id>/', views.approve_doctor, name='approve_doctor'),
+    path('admin-reject/<int:doctor_id>/', views.reject_doctor, name='reject_doctor'),
+
 ]
