@@ -13,7 +13,12 @@
         <h4 class="fw-bold">Dr. {{ doctor.user.username|title }}</h4>
         <p class="text-muted mb-1">Specialization: {{ doctor.specialization }}</p>
         {% if doctor.availability %}
-          <p><span class="badge bg-success">Available Days:</span> {{ available_days|join:", " }}</p>
+          <p class="mb-0">
+            <span class="badge bg-success">Available Days:</span>
+            {% for day in doctor.availability_days %}
+              <span class="badge bg-light text-dark ms-1">{{ day }}</span>
+            {% endfor %}
+          </p>
         {% else %}
           <p><span class="badge bg-secondary">Schedule Not Set</span></p>
         {% endif %}

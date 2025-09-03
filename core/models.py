@@ -72,11 +72,6 @@ class Appointment(models.Model):
 
 
 
-    @property
-    def is_outdated(self):
-        return self.date < timezone.now() and self.status == "PENDING"
-
-
     def has_conflict(self):
         
         # -------------------------

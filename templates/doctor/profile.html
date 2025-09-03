@@ -32,7 +32,11 @@
         <div class="col-md-12">
           <div class="p-3 border rounded bg-light h-100">
             <p class="fw-bold mb-1">📅 Availability</p>
-            <p class="mb-0 text-muted">{{ profile.availability_days|join:", " }}</p>
+            <p class="mb-0">
+                {% for day in profile.availability_days %}
+                  <span class="badge bg-light text-dark ms-1">{{ day }}</span>
+                {% endfor %}
+              </p>
           </div>
         </div>
       </div>
