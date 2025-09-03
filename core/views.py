@@ -10,7 +10,7 @@ from django.utils.timezone import now
 from django.utils.dateparse import parse_datetime
 from datetime import datetime
 from django.contrib.auth.decorators import user_passes_test
-
+from datetime import datetime, timedelta
 import pytz
 
 
@@ -450,6 +450,25 @@ def doctor_requests(request):
     return render(request, 'doctor/requests.html', {'pending': pending})
 
 
+
+def reject_conflicting_appointments(approved_appt):
+    """
+    Reject pending appointments for the same doctor that overlap
+    with the given approved appointment within ±30 minutes.
+    """
+    pending_appointments = Appointment.objects.filter(
+        status="PENDING",
+        doctor_id=approved_appt.doctor_id,
+        date__gte=approved_appt.date - timedelta(minutes=30),
+        date__lte=approved_appt.date + timedelta(minutes=30),
+    )
+
+    for pending in pending_appointments:
+        pending.status = "REJECTED"
+        pending.rejection_message = (
+            "Rejected due to conflict with another approved appointment."
+        )
+        pending.save()
 @login_required
 def approve_request(request, appt_id):
     if request.user.role != 'DOCTOR':
@@ -465,6 +484,7 @@ def approve_request(request, appt_id):
         appt.rejection_message = ''
         appt.save()
         messages.success(request, 'Appointment approved.')
+        reject_conflicting_appointments(appt)
     return redirect('doctor_requests')
 
 
