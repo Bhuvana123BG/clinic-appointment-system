@@ -33,15 +33,7 @@ class PatientProfile(models.Model):
 class DoctorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="doctor_profile")
     specialization = models.CharField(max_length=100)
-    # availability = models.CharField(max_length=100, blank=True)
     availability = models.JSONField(default=list, blank=True)
-    # Example: availability = [0, 2, 4] → 0=Monday, 2=Wednesday, 4=Friday
-
-    # def is_available_on(self, date):
-    #     """Check if the doctor is available on the given date."""
-    #     weekday = date.weekday()  # 0=Monday, 6=Sunday
-    #     return weekday in self.availability
-
     WEEKDAY_MAP = {
         0: "Monday",
         1: "Tuesday",
@@ -85,25 +77,8 @@ class Appointment(models.Model):
         return self.date < timezone.now() and self.status == "PENDING"
 
 
-    # def has_conflict(self):
-    #     appointment_date = self.date.date()  
-    #     return Appointment.objects.filter(
-    #         patient=self.patient,
-    #         doctor=self.doctor,   
-    #         date__date=appointment_date,
-    #         status__in=["PENDING", "APPROVED"]
-    #     ).exclude(id=self.id).exists()
-
-
     def has_conflict(self):
-        """
-        Check for conflicts:
-        1. Patient already has an appointment with this doctor on the same day.
-        2. Doctor has an appointment within ±30 minutes.
-        Returns:
-            None -> no conflict
-            dict -> details of conflict
-        """
+        
         # -------------------------
         # 1) Same-day conflict (patient + doctor)
         # -------------------------
