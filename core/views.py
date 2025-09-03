@@ -373,7 +373,7 @@ def edit_appointment(request, appointment_id):
         messages.error(request, "You cannot edit this appointment as it is already processed.")
         return redirect('patient_history')
 
-    now =timezone.now().astimezone(india_tz)\
+    now =timezone.now().astimezone(india_tz)
     
     if request.method == "POST":
         raw_date = request.POST.get("date")
