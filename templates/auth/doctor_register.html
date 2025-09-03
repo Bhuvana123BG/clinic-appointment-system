@@ -4,25 +4,25 @@
 {% include "includes/messages.html" %}
 
 <style>
-    body {
-      background: linear-gradient(135deg, #f0f9ff, #c6f6d5);
-    }
-    .card {
-      border-radius: 20px;
-      transition: transform 0.2s ease-in-out;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-    }
-    .register-link {
-      text-decoration: none !important;
-      font-weight: 500;
-      color: blue;
-    }
-    .register-link:hover {
-      color: green;
-    }
-  </style>
+  body {
+    background: linear-gradient(135deg, #f0f9ff, #c6f6d5);
+  }
+  .card {
+    border-radius: 20px;
+    transition: transform 0.2s ease-in-out;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  .register-link {
+    text-decoration: none !important;
+    font-weight: 500;
+    color: blue;
+  }
+  .register-link:hover {
+    color: green;
+  }
+</style>
 
 <div class="container mt-5">
   <div class="row justify-content-center">
@@ -58,6 +58,45 @@
             <div class="mb-3">
               <label for="specialization" class="form-label fw-semibold">Specialization</label>
               <input type="text" id="specialization" name="specialization" class="form-control rounded-3" placeholder="Enter specialization" required>
+            </div>
+
+            <!-- Available Days -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Select Available Days</label>
+              <div class="row">
+                <div class="col-6">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="availability" value="0" id="monday">
+                    <label class="form-check-label" for="monday">Monday</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="availability" value="1" id="tuesday">
+                    <label class="form-check-label" for="tuesday">Tuesday</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="availability" value="2" id="wednesday">
+                    <label class="form-check-label" for="wednesday">Wednesday</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="availability" value="3" id="thursday">
+                    <label class="form-check-label" for="thursday">Thursday</label>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="availability" value="4" id="friday">
+                    <label class="form-check-label" for="friday">Friday</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="availability" value="5" id="saturday">
+                    <label class="form-check-label" for="saturday">Saturday</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="availability" value="6" id="sunday">
+                    <label class="form-check-label" for="sunday">Sunday</label>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Submit -->

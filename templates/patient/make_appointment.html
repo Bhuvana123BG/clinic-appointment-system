@@ -26,7 +26,7 @@
                 <h5 class="fw-bold mb-1">Dr. {{ doctor.user.username|title }}</h5>
                 <p class="mb-0 text-muted">Specialization: {{ doctor.specialization }}</p>
                 {% if doctor.availability %}
-                  <p class="mb-0"><span class="badge bg-success">Available</span> {{ doctor.availability }}</p>
+                  <p class="mb-0"><span class="badge bg-success">Available Days:</span> {{doctor.availability_days|join:", " }}</p>
                 {% else %}
                   <p class="mb-0"><span class="badge bg-secondary">Schedule Not Set</span></p>
                 {% endif %}

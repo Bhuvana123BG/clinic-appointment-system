@@ -33,7 +33,32 @@ class PatientProfile(models.Model):
 class DoctorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="doctor_profile")
     specialization = models.CharField(max_length=100)
-    availability = models.CharField(max_length=100, blank=True)
+    # availability = models.CharField(max_length=100, blank=True)
+    availability = models.JSONField(default=list, blank=True)
+    # Example: availability = [0, 2, 4] → 0=Monday, 2=Wednesday, 4=Friday
+
+    # def is_available_on(self, date):
+    #     """Check if the doctor is available on the given date."""
+    #     weekday = date.weekday()  # 0=Monday, 6=Sunday
+    #     return weekday in self.availability
+
+    WEEKDAY_MAP = {
+        0: "Monday",
+        1: "Tuesday",
+        2: "Wednesday",
+        3: "Thursday",
+        4: "Friday",
+        5: "Saturday",
+        6: "Sunday",
+    }
+
+    def is_available_on(self, date):
+        """Check if doctor is available on a given date."""
+        return date.weekday() in self.availability
+
+    def availability_days(self):
+        """Return availability as day names."""
+        return [self.WEEKDAY_MAP[i] for i in self.availability]
 
     def __str__(self):
         return f"Dr. {self.user.username} - {self.specialization}"

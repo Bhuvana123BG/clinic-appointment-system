@@ -91,6 +91,8 @@ def doctor_register(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
         specialization = request.POST.get("specialization")
+        availability = request.POST.getlist("availability")  # list of strings
+        availability = [int(day) for day in availability]  # convert to integers
 
         if User.objects.filter(email=email).exists():
             messages.error(request, "Email already registered")
@@ -105,7 +107,7 @@ def doctor_register(request):
             is_approved=False   # custom flag
         )
 
-        DoctorProfile.objects.create(user=user, specialization=specialization)
+        DoctorProfile.objects.create(user=user, specialization=specialization,availability=availability)
 
         messages.success(request, "Registration successful! Wait for admin approval.")
         return redirect("doctor_login")
@@ -192,7 +194,8 @@ def make_appointment(request):
     return render(request, 'patient/make_appointment.html', {
         'q': q,
         'doctors': doctors,
-        'now': now.strftime("%Y-%m-%dT%H:%M")
+        'now': now.strftime("%Y-%m-%dT%H:%M"),
+        
     })
 
 @login_required
@@ -212,6 +215,7 @@ def doctor_detail(request, doctor_id):
         'doctor': doctor,
         "now": now.strftime("%Y-%m-%dT%H:%M"),
         'approved_appointments': approved_appointments,
+        "available_days": doctor.availability_days()
     })
 
 
@@ -242,6 +246,21 @@ def request_appointment(request, doctor_id):
             messages.error(request, "Please select a future date and time.")
             return redirect("doctor_detail", doctor_id=doctor.id)
 
+
+          # --- Check if doctor is available on this day ---
+        if not doctor.is_available_on(date):
+            next_available = None
+            for i in range(1, 8):  # next 7 days
+                check_date = date + timedelta(days=i)
+                if doctor.is_available_on(check_date):
+                    next_available = check_date.strftime("%A, %d %b %Y")
+                    break
+            messages.error(
+                request,
+                f"Doctor is not available on {date.strftime('%A')}. "
+                f"Next available day is {next_available}."
+            )
+            return redirect("doctor_detail", doctor_id=doctor.id)
         appointment = Appointment(
             doctor=doctor,
             patient=patient_profile,
@@ -249,6 +268,12 @@ def request_appointment(request, doctor_id):
             reason=reason,
             status="PENDING"
         )
+
+        #  # ✅ Check if doctor is available on that day
+        # if not doctor.is_available_on(date):
+        #     messages.error(request, "Doctor is not available on this day. Please select another day.")
+        #     return redirect("doctor_detail", doctor_id=doctor.id)
+
 
         # --- Check conflicts ---
         conflict = appointment.has_conflict()
@@ -583,7 +608,8 @@ def doctor_profile_edit(request):
         request.user.save()
 
         profile.specialization = request.POST.get('specialization', profile.specialization)
-        profile.availability = request.POST.get('availability', profile.availability)
+        selected_days = request.POST.getlist('availability')  # list of strings
+        profile.availability = [int(d) for d in selected_days]
         profile.save()
 
         messages.success(request, 'Profile updated.')
