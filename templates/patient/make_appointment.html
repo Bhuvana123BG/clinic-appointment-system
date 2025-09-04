@@ -26,10 +26,10 @@
                 <h5 class="fw-bold mb-1">Dr. {{ doctor.user.username|title }}</h5>
                 <p class="mb-0 text-muted">Specialization: {{ doctor.specialization }}</p>
                 {% if doctor.availability %}
-                  <p class="mb-0">
-                    <span class="badge bg-success">Available Days:</span>
+                <p class="mb-0">
+                    <strong>Available Days:</strong>
                     {% for day in doctor.availability_days %}
-                      <span class="badge bg-light text-dark ms-1">{{ day }}</span>
+                      {{ day }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                   </p>
                 {% else %}
@@ -38,7 +38,7 @@
               </div>
             </div>
             <div class="text-end">
-              <a class="btn btn-outline-secondary btn-sm me-2 mb-2" href="{% url 'doctor_detail' doctor.id %}">
+              <a class="btn btn-outline-secondary btn-sm me-2 " href="{% url 'doctor_detail' doctor.id %}">
                 View Details
               </a>
               <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#requestModal{{ doctor.id }}">

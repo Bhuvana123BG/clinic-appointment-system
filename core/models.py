@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password
+from .decorator import map_availability_days
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, blank=True)  
@@ -36,6 +37,9 @@ class InactiveDoctor(models.Model):
     password= models.CharField(max_length=150, blank=True)  
     specialization = models.CharField(max_length=100)
     availability = models.JSONField(default=list, blank=True)
+   
+    def availability_days(self):
+        return map_availability_days(self.availability)
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
@@ -45,23 +49,13 @@ class DoctorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="doctor_profile")
     specialization = models.CharField(max_length=100)
     availability = models.JSONField(default=list, blank=True)
-    WEEKDAY_MAP = {
-        0: "Monday",
-        1: "Tuesday",
-        2: "Wednesday",
-        3: "Thursday",
-        4: "Friday",
-        5: "Saturday",
-        6: "Sunday",
-    }
 
     def is_available_on(self, date):
         """Check if doctor is available on a given date."""
         return date.weekday() in self.availability
 
     def availability_days(self):
-        """Return availability as day names."""
-        return [self.WEEKDAY_MAP[i] for i in self.availability]
+        return map_availability_days(self.availability)
 
     def __str__(self):
         return f"Dr. {self.user.username} - {self.specialization}"

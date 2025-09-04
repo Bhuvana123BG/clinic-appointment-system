@@ -14,3 +14,15 @@ def login_required(view_func=None):
                 return redirect('/')
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+def map_availability_days(availability):
+    WEEKDAY_MAP = {
+        0: "Monday",
+        1: "Tuesday",
+        2: "Wednesday",
+        3: "Thursday",
+        4: "Friday",
+        5: "Saturday",
+        6: "Sunday",
+        }       
+    return [WEEKDAY_MAP[i] for i in availability]
