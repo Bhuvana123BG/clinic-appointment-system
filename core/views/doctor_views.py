@@ -6,6 +6,7 @@ from django.utils import timezone
 from core.models import User,DoctorProfile, Appointment,InactiveDoctor
 from .common_views import update_outdated_appointments
 from datetime import timedelta
+from django.db.models import Q
 
 
 
@@ -94,9 +95,10 @@ def doctor_requests(request):
 def reject_conflicting_appointments(approved_appt):
     pending_appointments = Appointment.objects.filter(
         status="PENDING",
-        doctor_id=approved_appt.doctor_id,
         date__gte=approved_appt.date - timedelta(minutes=30),
         date__lte=approved_appt.date + timedelta(minutes=30),
+    ).filter(
+        Q(doctor_id=approved_appt.doctor_id) | Q(patient_id=approved_appt.patient_id)
     )
 
     for pending in pending_appointments:
