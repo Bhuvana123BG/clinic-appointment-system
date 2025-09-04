@@ -91,7 +91,7 @@ def make_appointment(request):
     
     if q:
         doctors = doctors.filter(
-            Q(user__first_name__icontains=q) | Q(specialization__icontains=q)
+            Q(user__username__icontains=q) | Q(specialization__icontains=q)
         )
     
     now=timezone.localtime(timezone.now())
