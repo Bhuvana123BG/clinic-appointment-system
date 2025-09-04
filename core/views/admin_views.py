@@ -1,11 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
 from core.decorator import login_required
 from core.models import User
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from core.models import User
+from core.models import User,InactiveDoctor,DoctorProfile
 
 
 def is_admin(user):
@@ -14,30 +14,32 @@ def is_admin(user):
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    pending_doctors = User.objects.filter(role="DOCTOR", is_approved=False)
+    pending_doctors = InactiveDoctor.objects.all()
     return render(request, "auth/admin_dashboard.html", {"pending_doctors": pending_doctors})
 
 
 @login_required
 @user_passes_test(is_admin)
-def approve_doctor(request, doctor_id):
-    doctor = User.objects.get(id=doctor_id, role="DOCTOR")
-    doctor.is_approved = True     
-    doctor.is_active = True       
-   
-    doctor.save()
+def update_doctor_status(request, doctor_id, action):
     
-    return redirect("admin_dashboard")
+    doctor = get_object_or_404(InactiveDoctor, id=doctor_id)
 
+    if action == "approve":
 
-@login_required
-@user_passes_test(is_admin)
-def reject_doctor(request, doctor_id):
-    doctor = User.objects.get(id=doctor_id, role="DOCTOR")
+        user = User(
+            email=doctor.email,
+            role="DOCTOR",
+            username=doctor.username
+        )
+        # doctor.password here is already hashed
+        user.password = doctor.password  
+        user.save()
+
+        DoctorProfile.objects.create(user=user,specialization=doctor.specialization,availability=doctor.availability)
     
     doctor.delete()
     
-    return redirect("admin_dashboard")
+    return redirect('admin_dashboard') 
 
 
 def admin_login(request):

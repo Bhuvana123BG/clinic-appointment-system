@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.contrib.auth.hashers import make_password
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, blank=True)  
@@ -12,7 +13,6 @@ class User(AbstractUser):
         ("DOCTOR", "Doctor"),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="PATIENT")
-    is_approved = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"        
     REQUIRED_FIELDS = ["username"]  
@@ -28,6 +28,17 @@ class PatientProfile(models.Model):
 
     def __str__(self):
         return f"Patient: {self.user.username} ({self.user.email})"
+
+
+class InactiveDoctor(models.Model):
+    username = models.CharField(max_length=150, blank=True)  
+    email = models.EmailField(unique=True)
+    password= models.CharField(max_length=150, blank=True)  
+    specialization = models.CharField(max_length=100)
+    availability = models.JSONField(default=list, blank=True)
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
 
 
 class DoctorProfile(models.Model):
@@ -122,3 +133,5 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.patient.user.username} → Dr. {self.doctor.user.username} ({self.status})"
+
+

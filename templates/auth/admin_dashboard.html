@@ -24,10 +24,10 @@
               {% endif %}
             </div>
             <div class="d-flex gap-2">
-              <a href="{% url 'approve_doctor' doctor.id %}" class="btn btn-success btn-sm rounded-3 shadow-sm">
+              <a href="{% url 'update_doctor_status' doctor.id 'approve' %}" class="btn btn-success btn-sm rounded-3 shadow-sm">
                 <i class="bi bi-check-circle"></i> Approve
               </a>
-              <a href="{% url 'reject_doctor' doctor.id %}" class="btn btn-danger btn-sm rounded-3 shadow-sm">
+              <a href="{% url 'update_doctor_status' doctor.id  'reject' %}" class="btn btn-danger btn-sm rounded-3 shadow-sm">
                 <i class="bi bi-x-circle"></i> Reject
               </a>
             </div>

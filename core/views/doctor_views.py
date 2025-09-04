@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from core.decorator import login_required
 from django.utils import timezone
-from core.models import User,DoctorProfile, Appointment
+from core.models import User,DoctorProfile, Appointment,InactiveDoctor
 from .common_views import update_outdated_appointments
 from datetime import timedelta
 
@@ -11,32 +11,33 @@ from datetime import timedelta
 
 def doctor_register(request):
     if request.method == "POST":
-        name = request.POST.get("name")
+    
         email = request.POST.get("email")
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered")
+            return redirect("doctor_register")
+
+        name = request.POST.get("name")     
         password = request.POST.get("password")
         specialization = request.POST.get("specialization")
         availability = request.POST.getlist("availability")  # list of strings
         availability = [int(day) for day in availability]  # convert to integers
 
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "Email already registered")
-            return redirect("doctor_register")
-
-        user = User.objects.create_user(
-            username=name,   
+        doc = InactiveDoctor(
+            username=name,
             email=email,
-            password=password,
-            role="DOCTOR",
-            is_active=False,    # inactive until admin approval
-            is_approved=False   
+            specialization=specialization,
+            availability=availability
         )
 
-        DoctorProfile.objects.create(user=user, specialization=specialization,availability=availability)
+        doc.set_password(password)  # hash manually
+        doc.save()
 
         messages.success(request, "Registration successful! Wait for admin approval.")
         return redirect("doctor_login")
 
     return render(request, "auth/doctor_register.html")
+
 def doctor_login(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -44,11 +45,8 @@ def doctor_login(request):
         user = authenticate(request, email=email, password=password)
 
         if user and user.role == "DOCTOR":
-            if user.is_active and user.is_approved:
-                login(request, user)
-                return redirect("doctor_dashboard")
-            else:
-                messages.error(request, "Your account is pending admin approval.")
+            login(request, user)
+            return redirect("doctor_dashboard")
         else:
             messages.error(request, "Invalid credentials")
 

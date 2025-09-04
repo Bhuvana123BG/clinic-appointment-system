@@ -37,7 +37,6 @@ urlpatterns = [
     # Admin Routes
     path('admin-login/', views.admin_login, name='admin_login'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
-    path('admin-approve/<int:doctor_id>/', views.approve_doctor, name='approve_doctor'),
-    path('admin-reject/<int:doctor_id>/', views.reject_doctor, name='reject_doctor'),
+    path('doctor/<int:doctor_id>/<str:action>/', views.update_doctor_status, name='update_doctor_status')
 
 ]
